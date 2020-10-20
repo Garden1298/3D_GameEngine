@@ -65,14 +65,85 @@ void Renderer::init()
 
 void Renderer::render()
 {
-	for (int i = 0; i < _renderingObject->size(); i++)
+	for (std::vector<RenderableObject*>::iterator iter = _OBJ.begin(); iter != _OBJ.end(); iter++)
 	{
-		//RenderableObject* obj = _renderingObject[i];
+		//화면 지우기
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		//renderer(_renderingObject[i]);
+		//쉐이더 사용
+		glUseProgram((*iter)->programID);
+
+		glm::mat4 Projection = glm::perspective(glm::radians(45.0f), 4.0f / 3.0f, 0.1f, 100.0f);
+		glm::mat4 View = glm::lookAt(
+			glm::vec3(-3, 3, 5),
+			glm::vec3(0, 0, 0),
+			glm::vec3(0, 1, 0)
+		);
+
+		glm::mat4 Model = glm::mat4(1.0f);
+		glm::mat4 MVP = Projection * View * Model;	//카메라 설정
+
+		glUniformMatrix4fv((*iter)->MatrixID, 1, GL_FALSE, &MVP[0][0]);
+		glUniformMatrix4fv((*iter)->ModelMatrixID, 1, GL_FALSE, &Model[0][0]);
+		glUniformMatrix4fv((*iter)->ViewMatrixID, 1, GL_FALSE, &View[0][0]);
+
+		glm::vec3 lightPos = glm::vec3(0, 0, 10);
+		glUniform3f((*iter)->LightID, lightPos.x, lightPos.y, lightPos.z);
+
+		// Bind our texture in Texture Unit 0
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, (*iter)->Texture);
+		// Set our "myTextureSampler" sampler to use Texture Unit 0
+		glUniform1i((*iter)->TextureID, 0);
+
+		// 1rst attribute buffer : vertices
+		glEnableVertexAttribArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, (*iter)->vertexbuffer);
+		glVertexAttribPointer(
+			0,                  // attribute
+			3,                  // size
+			GL_FLOAT,           // type
+			GL_FALSE,           // normalized?
+			0,                  // stride
+			(void*)0            // array buffer offset
+		);
+
+		// 2nd attribute buffer : UVs
+		glEnableVertexAttribArray(1);
+		glBindBuffer(GL_ARRAY_BUFFER, (*iter)->uvbuffer);
+		glVertexAttribPointer(
+			1,                                // attribute
+			2,                                // size
+			GL_FLOAT,                         // type
+			GL_FALSE,                         // normalized?
+			0,                                // stride
+			(void*)0                          // array buffer offset
+		);
+
+		// 3rd attribute buffer : normals
+		glEnableVertexAttribArray(2);
+		glBindBuffer(GL_ARRAY_BUFFER, (*iter)->normalbuffer);
+		glVertexAttribPointer(
+			2,                                // attribute
+			3,                                // size
+			GL_FLOAT,                         // type
+			GL_FALSE,                         // normalized?
+			0,                                // stride
+			(void*)0                          // array buffer offset
+		);
+
+		// Draw the triangles !
+		glDrawArrays(GL_TRIANGLES, 0, (*iter)->vertices.size());
+
+		glDisableVertexAttribArray(0);
+		glDisableVertexAttribArray(1);
+		glDisableVertexAttribArray(2);
+
+		// Swap buffers
+		glfwSwapBuffers(window);
+		glfwPollEvents();
 	}
 }
-
 
 void Renderer::renderer(RenderableObject* render_obj) 
 {
@@ -97,6 +168,11 @@ void Renderer::renderer(RenderableObject* render_obj)
 
 	glm::vec3 lightPos = glm::vec3(0, 0, 10);
 	glUniform3f(render_obj -> LightID, lightPos.x, lightPos.y, lightPos.z);
+
+
+
+
+
 
 	// Bind our texture in Texture Unit 0
 	glActiveTexture(GL_TEXTURE0);
@@ -153,9 +229,14 @@ void Renderer::renderer(RenderableObject* render_obj)
 
 }
 
-void Renderer::addObject(IRenderer* src_obj)
+//void Renderer::addObject(IRenderer* src_obj)
+//{
+//	_renderingObject->push_back(src_obj);
+//}
+
+void Renderer::addObject(RenderableObject* src_obj)
 {
-	_renderingObject->push_back(src_obj);
+	_OBJ.push_back(src_obj);
 }
 
 void Renderer::update(IUpdater* src_obj)

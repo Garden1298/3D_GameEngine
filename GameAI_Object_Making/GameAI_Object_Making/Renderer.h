@@ -17,6 +17,7 @@ public:
 	GLFWwindow* window;
 
 	std::vector<IRenderer*>* _renderingObject;
+	std::vector<RenderableObject*> _OBJ;
 
 	static Renderer* instance()
 	{
@@ -28,6 +29,7 @@ public:
 	void render();
 	void renderer(RenderableObject* render_obj);
 	void update(IUpdater* src_obj);//렌더되지 않은 걸 업데이트 해주는 멤버함수
-	void addObject(IRenderer* src_obj);
+	//void addObject(IRenderer* src_obj);
+	void addObject(RenderableObject* src_obj);
 	virtual void shutDown() override;
 };

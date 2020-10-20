@@ -41,8 +41,8 @@ int main()
 		"fs.shader");
 
 
-	Sphere* sphere = new Sphere();
-	renderer->addObject(sphere);
+	//Sphere* sphere = new Sphere();
+	//renderer->addObject(sphere);
 
 	NonRenderSample* non_render = new NonRenderSample();
 
@@ -54,13 +54,13 @@ int main()
 	}
 
 	cube->shutDown();
-	sphere->shutDown();
+	//sphere->shutDown();
 	non_render->shutDown();
 
 	renderer->shutDown();
 
 	delete cube;
-	delete sphere;
+	//delete sphere;
 	delete non_render;
 
 	return 0; 
