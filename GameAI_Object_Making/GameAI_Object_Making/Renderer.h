@@ -27,7 +27,7 @@ public:
 
 	void init();
 	void render();
-	void renderer(RenderableObject* render_obj);
+	//void renderer(RenderableObject* render_obj);
 	void update(IUpdater* src_obj);//렌더되지 않은 걸 업데이트 해주는 멤버함수
 	//void addObject(IRenderer* src_obj);
 	void addObject(RenderableObject* src_obj);

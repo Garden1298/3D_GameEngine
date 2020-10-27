@@ -46,16 +46,15 @@ int main()
 
 	NonRenderSample* non_render = new NonRenderSample();
 
-
 	while (true)
 	{
 		renderer->update(non_render);
 		renderer->render();
 	}
 
-	cube->shutDown();
-	//sphere->shutDown();
-	non_render->shutDown();
+	//cube->shutDown();
+	////sphere->shutDown();
+	//non_render->shutDown();
 
 	renderer->shutDown();
 
