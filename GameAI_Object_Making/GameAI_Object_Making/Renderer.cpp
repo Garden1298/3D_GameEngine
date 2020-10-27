@@ -2,7 +2,9 @@
 
 void Renderer::init()
 {
-	_renderingObject = new std::vector<IRenderer*>(10);
+	//_renderingObject = new std::vector<RenderableObject*>;
+	//_nonRenderingObject = new std::vector<NonRenderableObject*>;
+	control = new ControlableObject;
 
 	if (!glfwInit()) {
 		std::cout << "GLFW 초기화 실패" << '\n';
@@ -51,8 +53,8 @@ void Renderer::init()
 	glfwPollEvents();
 	glfwSetCursorPos(window, 1024 / 2, 768 / 2);
 
-	//화면 하얗게 채우기
-	glClearColor(1, 1, 1, 1);
+	// Dark blue background
+	glClearColor(0.2f, 0.0f, 0.4f, 0.0f);
 
 	// depth test
 	glEnable(GL_DEPTH_TEST);
@@ -65,22 +67,20 @@ void Renderer::init()
 
 void Renderer::render()
 {
-	for (std::vector<RenderableObject*>::iterator iter = _OBJ.begin(); iter != _OBJ.end(); iter++)
+	glViewport(0, 0, 1024, 768);
+
+	//화면 지우기
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
+	//쉐이더 사용
+	glUseProgram(programID);
+
+	for (std::vector<RenderableObject*>::iterator iter = _renderingObject.begin(); iter != _renderingObject.end(); iter++)
 	{
-		//화면 지우기
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glm::mat4 Projection = control->getProjectionMatrix();
+		glm::mat4 View = control->getViewMatrix();
 
-		//쉐이더 사용
-		glUseProgram((*iter)->programID);
-
-		glm::mat4 Projection = glm::perspective(glm::radians(45.0f), 4.0f / 3.0f, 0.1f, 100.0f);
-		glm::mat4 View = glm::lookAt(
-			glm::vec3(-3, 3, 5),
-			glm::vec3(0, 0, 0),
-			glm::vec3(0, 1, 0)
-		);
-
-		glm::mat4 Model = glm::mat4(1.0f);
+		glm::mat4 Model = (*iter)->modelMatrix;
 		glm::mat4 MVP = Projection * View * Model;	//카메라 설정
 
 		glUniformMatrix4fv((*iter)->MatrixID, 1, GL_FALSE, &MVP[0][0]);
@@ -132,127 +132,57 @@ void Renderer::render()
 			(void*)0                          // array buffer offset
 		);
 
+		// Index buffer
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, (*iter)->elementbuffer);
+
 		// Draw the triangles !
-		glDrawArrays(GL_TRIANGLES, 0, (*iter)->vertices.size());
-
-		glDisableVertexAttribArray(0);
-		glDisableVertexAttribArray(1);
-		glDisableVertexAttribArray(2);
-
-		// Swap buffers
-		glfwSwapBuffers(window);
-		glfwPollEvents();
+		glDrawElements(
+			GL_TRIANGLES,      // mode
+			(*iter)->indices.size(),    // count
+			GL_UNSIGNED_SHORT, // type
+			(void*)0           // element array buffer offset
+		);
 	}
+
+	glDisableVertexAttribArray(0);
+	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(2);
+
+	// Swap buffers
+	glfwSwapBuffers(window);
+	glfwPollEvents();
 }
-
-//void Renderer::renderer(RenderableObject* render_obj) 
-//{
-//	//화면 지우기
-//	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//
-//	//쉐이더 사용
-//	glUseProgram(render_obj->programID);
-//
-//	glm::mat4 Projection = glm::perspective(glm::radians(45.0f), 4.0f / 3.0f, 0.1f, 100.0f);
-//	glm::mat4 View = glm::lookAt(
-//		glm::vec3(-3, 3, 5),
-//		glm::vec3(0, 0, 0),
-//		glm::vec3(0, 1, 0)
-//	);
-//	glm::mat4 Model = glm::mat4(1.0f);
-//	glm::mat4 MVP = Projection * View * Model;	//카메라 설정
-//
-//	glUniformMatrix4fv(render_obj->MatrixID, 1, GL_FALSE, &MVP[0][0]);
-//	glUniformMatrix4fv(render_obj->ModelMatrixID, 1, GL_FALSE, &Model[0][0]);
-//	glUniformMatrix4fv(render_obj->ViewMatrixID, 1, GL_FALSE, &View[0][0]);
-//
-//	glm::vec3 lightPos = glm::vec3(0, 0, 10);
-//	glUniform3f(render_obj -> LightID, lightPos.x, lightPos.y, lightPos.z);
-//
-//
-//
-//
-//
-//
-//	// Bind our texture in Texture Unit 0
-//	glActiveTexture(GL_TEXTURE0);
-//	glBindTexture(GL_TEXTURE_2D, render_obj->Texture);
-//	// Set our "myTextureSampler" sampler to use Texture Unit 0
-//	glUniform1i(render_obj->TextureID, 0);
-//
-//	// 1rst attribute buffer : vertices
-//	glEnableVertexAttribArray(0);
-//	glBindBuffer(GL_ARRAY_BUFFER, render_obj->vertexbuffer);
-//	glVertexAttribPointer(
-//		0,                  // attribute
-//		3,                  // size
-//		GL_FLOAT,           // type
-//		GL_FALSE,           // normalized?
-//		0,                  // stride
-//		(void*)0            // array buffer offset
-//	);
-//
-//	// 2nd attribute buffer : UVs
-//	glEnableVertexAttribArray(1);
-//	glBindBuffer(GL_ARRAY_BUFFER, render_obj->uvbuffer);
-//	glVertexAttribPointer(
-//		1,                                // attribute
-//		2,                                // size
-//		GL_FLOAT,                         // type
-//		GL_FALSE,                         // normalized?
-//		0,                                // stride
-//		(void*)0                          // array buffer offset
-//	);
-//
-//	// 3rd attribute buffer : normals
-//	glEnableVertexAttribArray(2);
-//	glBindBuffer(GL_ARRAY_BUFFER, render_obj->normalbuffer);
-//	glVertexAttribPointer(
-//		2,                                // attribute
-//		3,                                // size
-//		GL_FLOAT,                         // type
-//		GL_FALSE,                         // normalized?
-//		0,                                // stride
-//		(void*)0                          // array buffer offset
-//	);
-//
-//	// Draw the triangles !
-//	glDrawArrays(GL_TRIANGLES, 0, render_obj->vertices.size());
-//
-//	glDisableVertexAttribArray(0);
-//	glDisableVertexAttribArray(1);
-//	glDisableVertexAttribArray(2);
-//
-//	// Swap buffers
-//	glfwSwapBuffers(window);
-//	glfwPollEvents();
-//
-//}
-
-//void Renderer::addObject(IRenderer* src_obj)
-//{
-//	_renderingObject->push_back(src_obj);
-//}
 
 void Renderer::addObject(RenderableObject* src_obj)
 {
-	_OBJ.push_back(src_obj);
+	_renderingObject.push_back(src_obj);
+}
+
+void Renderer::addObject(NonRenderableObject* src_obj)
+{
+	_nonRenderingObject.push_back(src_obj);
 }
 
 void Renderer::update(IUpdater* src_obj)
 {
-	src_obj->update();
+	for (std::vector<NonRenderableObject*>::iterator iter = _nonRenderingObject.begin(); iter != _nonRenderingObject.end(); iter++)
+	{
+		src_obj->update();
+	}
 }
 
 void Renderer::shutDown()
 {
 
-	for (std::vector<RenderableObject*>::iterator iter = _OBJ.begin(); iter != _OBJ.end(); iter++)
+	for (std::vector<RenderableObject*>::iterator iter = _renderingObject.begin(); iter != _renderingObject.end(); iter++)
 	{
 		(*iter)->shutDown();
 	}
 
-	delete _renderingObject;
+	glDeleteProgram(programID);
+
+	delete& _renderingObject;
+	delete& _nonRenderingObject;
 
 	glfwTerminate();
 }

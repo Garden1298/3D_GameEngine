@@ -6,8 +6,6 @@
 #include "glm/gtc/matrix_transform.hpp"
 
 #include "ICleanUp.h"
-#include "IUpdater.h"
-#include "IRenderer.h"
 
 class Object:public ICleanUp
 {

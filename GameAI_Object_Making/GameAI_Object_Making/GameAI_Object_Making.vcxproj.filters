@@ -39,6 +39,9 @@
     <ClCompile Include="NonRenderSample.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="ControlableObject.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FileManager.h">
@@ -74,6 +77,9 @@
     <ClInclude Include="NonRenderSample.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="ControlableObject.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="fs.shader" />
@@ -81,6 +87,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="uvtemplate.DDS" />
+    <Image Include="cube.DDS" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="GameAI_Object_Making.rc">

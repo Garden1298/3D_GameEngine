@@ -3,21 +3,27 @@
 
 #include "include/GL/glew.h"
 #include "include/GLFW/glfw3.h" 
+#include "glm/gtc/matrix_transform.hpp"
 
 #include "Object.h"
 #include "ICleanUp.h"
-#include "RenderableObject.h"
+#include "IRenderer.h"
+//#include "RenderableObject.h"
 #include "NonRenderableObject.h"
+#include "ControlableObject.h"
+
+class RenderableObject;
 
 class Renderer : public ICleanUp
 {
-private:
-
 public:
 	GLFWwindow* window;
+	ControlableObject* control;
 
-	std::vector<IRenderer*>* _renderingObject;
-	std::vector<RenderableObject*> _OBJ;
+	std::vector<RenderableObject*> _renderingObject;
+	std::vector<NonRenderableObject*> _nonRenderingObject;
+
+	GLuint programID;
 
 	static Renderer* instance()
 	{
@@ -27,9 +33,10 @@ public:
 
 	void init();
 	void render();
-	//void renderer(RenderableObject* render_obj);
 	void update(IUpdater* src_obj);//렌더되지 않은 걸 업데이트 해주는 멤버함수
-	//void addObject(IRenderer* src_obj);
 	void addObject(RenderableObject* src_obj);
+	void addObject(NonRenderableObject* src_obj);
 	virtual void shutDown() override;
+
+	GLuint GetProgramID() { return programID; }
 };

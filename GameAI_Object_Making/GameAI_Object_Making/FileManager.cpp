@@ -13,7 +13,8 @@ void FileManager::loadObj(
 	std::string obj_path,
 	std::string texture_path,
 	std::string vs_shader_path,
-	std::string fs_shader_path )
+	std::string fs_shader_path,
+	Renderer* render_obj)
 {
 	//쉐이더 로딩
 	{
@@ -21,24 +22,27 @@ void FileManager::loadObj(
 		glGenVertexArrays(1, &target_obj->VertexArrayID);
 		glBindVertexArray(target_obj->VertexArrayID);
 
-		target_obj->programID = LoadShaders(vs_shader_path.c_str(), fs_shader_path.c_str());
+		render_obj->programID = LoadShaders(vs_shader_path.c_str(), fs_shader_path.c_str());
 	}
 
-	target_obj->MatrixID = glGetUniformLocation(target_obj->programID, "MVP");
-	target_obj->ViewMatrixID = glGetUniformLocation(target_obj->programID, "V");
-	target_obj->ModelMatrixID = glGetUniformLocation(target_obj->programID, "M");
+	target_obj->MatrixID = glGetUniformLocation(render_obj->programID, "MVP");
+	target_obj->ViewMatrixID = glGetUniformLocation(render_obj->programID, "V");
+	target_obj->ModelMatrixID = glGetUniformLocation(render_obj->programID, "M");
 
 	//텍스쳐 로딩
 	{
 		// Load the texture
 		target_obj->Texture = loadDDS(texture_path.c_str());
 		// Get a handle for our "myTextureSampler" uniform
-		target_obj->TextureID = glGetUniformLocation(target_obj->programID, "myTextureSampler");
+		target_obj->TextureID = glGetUniformLocation(render_obj->programID, "myTextureSampler");
 	}
 
 	//오브젝트 로딩
 	{
 		loadOBJ(obj_path.c_str(), target_obj->vertices, target_obj->uvs, target_obj->normals);
+
+		indexVBO(target_obj->vertices, target_obj->uvs, target_obj->normals,
+			target_obj->indices, target_obj->indexed_vertices, target_obj->indexed_uvs, target_obj->indexed_normals);
 
 		glGenBuffers(1, &target_obj->vertexbuffer);
 		glBindBuffer(GL_ARRAY_BUFFER, target_obj->vertexbuffer);
@@ -51,13 +55,17 @@ void FileManager::loadObj(
 		glGenBuffers(1, &target_obj->normalbuffer);
 		glBindBuffer(GL_ARRAY_BUFFER, target_obj->normalbuffer);
 		glBufferData(GL_ARRAY_BUFFER, target_obj->normals.size() * sizeof(glm::vec3), &target_obj->normals[0], GL_STATIC_DRAW);
+
+		glGenBuffers(1, &target_obj->elementbuffer);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, target_obj->elementbuffer);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, target_obj->indices.size() * sizeof(unsigned short), &target_obj->indices[0], GL_STATIC_DRAW);
 	}
 
 	//라이트 셋업
 	{
 		// Get a handle for our "LightPosition" uniform
-		glUseProgram(target_obj->programID);
-		target_obj->LightID = glGetUniformLocation(target_obj->programID, "LightPosition_worldspace");
+		glUseProgram(render_obj->programID);
+		target_obj->LightID = glGetUniformLocation(render_obj->programID, "LightPosition_worldspace");
 	}
 }
 
@@ -322,19 +330,16 @@ GLuint FileManager::loadDDS(const char* imagepath) {
 	free(buffer);
 
 	return textureID;
-
-
 }
 
 
-GLuint FileManager:: LoadShaders(const char* vertex_file_path, const char* fragment_file_path) 
-{
+GLuint FileManager:: LoadShaders(const char* vertex_file_path, const char* fragment_file_path) {
 
-	// 쉐이더들 생성
+	// Create the shaders
 	GLuint VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
 	GLuint FragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
 
-	// 버텍스 쉐이더 코드를 파일에서 읽기
+	// Read the Vertex Shader code from the file
 	std::string VertexShaderCode;
 	std::ifstream VertexShaderStream(vertex_file_path, std::ios::in);
 	if (VertexShaderStream.is_open()) {
@@ -344,12 +349,12 @@ GLuint FileManager:: LoadShaders(const char* vertex_file_path, const char* fragm
 		VertexShaderStream.close();
 	}
 	else {
-		printf("파일 %s 를 읽을 수 없음. 정확한 디렉토리를 사용 중입니까 ? FAQ 를 우선 읽어보는 걸 잊지 마세요!\n", vertex_file_path);
+		printf("Impossible to open %s. Are you in the right directory ? Don't forget to read the FAQ !\n", vertex_file_path);
 		getchar();
 		return 0;
 	}
 
-	// 프래그먼트 쉐이더 코드를 파일에서 읽기
+	// Read the Fragment Shader code from the file
 	std::string FragmentShaderCode;
 	std::ifstream FragmentShaderStream(fragment_file_path, std::ios::in);
 	if (FragmentShaderStream.is_open()) {
@@ -363,13 +368,13 @@ GLuint FileManager:: LoadShaders(const char* vertex_file_path, const char* fragm
 	int InfoLogLength;
 
 
-	// 버텍스 쉐이더를 컴파일
+	// Compile Vertex Shader
 	printf("Compiling shader : %s\n", vertex_file_path);
 	char const* VertexSourcePointer = VertexShaderCode.c_str();
 	glShaderSource(VertexShaderID, 1, &VertexSourcePointer, NULL);
 	glCompileShader(VertexShaderID);
 
-	// 버텍스 쉐이더를 검사
+	// Check Vertex Shader
 	glGetShaderiv(VertexShaderID, GL_COMPILE_STATUS, &Result);
 	glGetShaderiv(VertexShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
 	if (InfoLogLength > 0) {
@@ -378,13 +383,15 @@ GLuint FileManager:: LoadShaders(const char* vertex_file_path, const char* fragm
 		printf("%s\n", &VertexShaderErrorMessage[0]);
 	}
 
-	// 프래그먼트 쉐이더를 컴파일
+
+
+	// Compile Fragment Shader
 	printf("Compiling shader : %s\n", fragment_file_path);
 	char const* FragmentSourcePointer = FragmentShaderCode.c_str();
 	glShaderSource(FragmentShaderID, 1, &FragmentSourcePointer, NULL);
 	glCompileShader(FragmentShaderID);
 
-	// 프래그먼트 쉐이더를 검사
+	// Check Fragment Shader
 	glGetShaderiv(FragmentShaderID, GL_COMPILE_STATUS, &Result);
 	glGetShaderiv(FragmentShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
 	if (InfoLogLength > 0) {
@@ -393,14 +400,16 @@ GLuint FileManager:: LoadShaders(const char* vertex_file_path, const char* fragm
 		printf("%s\n", &FragmentShaderErrorMessage[0]);
 	}
 
-	// 프로그램에 링크
+
+
+	// Link the program
 	printf("Linking program\n");
 	GLuint ProgramID = glCreateProgram();
 	glAttachShader(ProgramID, VertexShaderID);
 	glAttachShader(ProgramID, FragmentShaderID);
 	glLinkProgram(ProgramID);
 
-	// 프로그램 검사
+	// Check the program
 	glGetProgramiv(ProgramID, GL_LINK_STATUS, &Result);
 	glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &InfoLogLength);
 	if (InfoLogLength > 0) {
@@ -409,6 +418,7 @@ GLuint FileManager:: LoadShaders(const char* vertex_file_path, const char* fragm
 		printf("%s\n", &ProgramErrorMessage[0]);
 	}
 
+
 	glDetachShader(ProgramID, VertexShaderID);
 	glDetachShader(ProgramID, FragmentShaderID);
 
@@ -416,4 +426,54 @@ GLuint FileManager:: LoadShaders(const char* vertex_file_path, const char* fragm
 	glDeleteShader(FragmentShaderID);
 
 	return ProgramID;
+}
+
+bool FileManager::getSimilarVertexIndex_fast(
+	PackedVertex& packed,
+	std::map<PackedVertex, unsigned short>& VertexToOutIndex,
+	unsigned short& result) 
+{
+	std::map<PackedVertex, unsigned short>::iterator it = VertexToOutIndex.find(packed);
+	if (it == VertexToOutIndex.end()) {
+		return false;
+	}
+	else {
+		result = it->second;
+		return true;
+	}
+}
+
+void FileManager:: indexVBO(
+	std::vector<glm::vec3>& in_vertices,
+	std::vector<glm::vec2>& in_uvs,
+	std::vector<glm::vec3>& in_normals,
+
+	std::vector<unsigned short>& out_indices,
+	std::vector<glm::vec3>& out_vertices,
+	std::vector<glm::vec2>& out_uvs,
+	std::vector<glm::vec3>& out_normals) 
+{
+	std::map<PackedVertex, unsigned short> VertexToOutIndex;
+
+	// For each input vertex
+	for (unsigned int i = 0; i < in_vertices.size(); i++) {
+
+		PackedVertex packed = { in_vertices[i], in_uvs[i], in_normals[i] };
+
+		// Try to find a similar vertex in out_XXXX
+		unsigned short index;
+		bool found = getSimilarVertexIndex_fast(packed, VertexToOutIndex, index);
+
+		if (found) { // A similar vertex is already in the VBO, use it instead !
+			out_indices.push_back(index);
+		}
+		else { // If not, it needs to be added in the output data.
+			out_vertices.push_back(in_vertices[i]);
+			out_uvs.push_back(in_uvs[i]);
+			out_normals.push_back(in_normals[i]);
+			unsigned short newindex = (unsigned short)out_vertices.size() - 1;
+			out_indices.push_back(newindex);
+			VertexToOutIndex[packed] = newindex;
+		}
+	}
 }

@@ -14,6 +14,7 @@
 #include "FileManager.h"
 #include "Sphere.h"
 #include "NonRenderSample.h"
+#include "ControlableObject.h"
 
 using namespace glm;
 
@@ -27,22 +28,31 @@ int main()
 
 	Renderer* renderer = Renderer::instance();
 	renderer->init();
-	//renderer->setCameraPosition(glm::vec3(0.0f, 10.0f, 0.0f));
 
 	RenderableObject* cube = new RenderableObject();
 	renderer->addObject(cube);
-	//cube->setPosition(glm::vec3(0.0f, 2.0f, 0.0f));
+	cube->setPosition(glm::vec3(1.0f, 1.0f, 1.0f));
 
 	file_mgr->loadObj(
 		cube,
 		"cube.obj",
 		"uvtemplate.DDS",
 		"vs.shader",
-		"fs.shader");
+		"fs.shader",
+		renderer);
 
+	ControlableObject* moving_cube = new ControlableObject();
 
-	//Sphere* sphere = new Sphere();
-	//renderer->addObject(sphere);
+	renderer->addObject(moving_cube);
+	moving_cube->setPosition(glm::vec3(1.0f, 5.0f, 1.0f));
+
+	file_mgr->loadObj(
+		moving_cube,
+		"cube.obj",
+		"uvtemplate.DDS",
+		"vs.shader",
+		"fs.shader",
+		renderer);
 
 	NonRenderSample* non_render = new NonRenderSample();
 
@@ -50,17 +60,15 @@ int main()
 	{
 		renderer->update(non_render);
 		renderer->render();
-	}
 
-	//cube->shutDown();
-	////sphere->shutDown();
-	//non_render->shutDown();
+		moving_cube->computeMatricesFromInputs(renderer->window,moving_cube);		
+	}
 
 	renderer->shutDown();
 
 	delete cube;
-	//delete sphere;
 	delete non_render;
+	delete moving_cube;
 
 	return 0; 
 }

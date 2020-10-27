@@ -139,6 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ControlableObject.cpp" />
     <ClCompile Include="FileManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NonRenderableObject.cpp" />
@@ -149,6 +150,7 @@
     <ClCompile Include="Sphere.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ControlableObject.h" />
     <ClInclude Include="FileManager.h" />
     <ClInclude Include="ICleanUp.h" />
     <ClInclude Include="IRenderer.h" />
@@ -166,6 +168,7 @@
     <None Include="vs.shader" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="cube.DDS" />
     <Image Include="uvtemplate.DDS" />
   </ItemGroup>
   <ItemGroup>
