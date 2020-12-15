@@ -16,6 +16,8 @@
 
 using namespace std;
 
+class RenderableObject;
+
 class FileManager
 {
 public:

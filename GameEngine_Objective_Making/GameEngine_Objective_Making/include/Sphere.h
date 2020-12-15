@@ -1,5 +1,5 @@
 #pragma once
-#include "RenderableObject.h"
+#include "../RenderableObject.h"
 
 class Sphere : public RenderableObject
 {

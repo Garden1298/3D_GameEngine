@@ -2,8 +2,9 @@
 
 #include "Object.h"
 #include "IRenderer.h"
+#include "CompositeObject.h"
 
-class RenderableObject :public Object, public IRenderer
+class RenderableObject :public Object, public IRenderer, public CompositeObject
 {
 public:
 	//정점들에 대한 데이터
@@ -34,7 +35,21 @@ public:
 
 	glm::mat4 modelMatrix;
 
-	virtual void shutDown()override;
 	virtual void render()override{};
+	void addObject(RenderableObject* obj);
 	void setPosition(glm::vec3 position);
+	//void loadOBJ(RenderableObject* target_obj,
+	//	std::string obj_path,
+	//	std::string texture_path,
+	//	std::string vs_shader_path,
+	//	std::string fs_shader_path,
+	//	Renderer* render_obj);
+
+	virtual void init() {}
+	virtual void renderer() {}
+	virtual void update() {}
+	virtual void shutDown()override;
+
+	RenderableObject() {}
+	~RenderableObject() {}
 };

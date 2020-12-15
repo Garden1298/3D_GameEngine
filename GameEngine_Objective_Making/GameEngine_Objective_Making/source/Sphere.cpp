@@ -1,4 +1,4 @@
-#include "Sphere.h"
+#include "../include/Sphere.h"
 
 void Sphere::shutDown()
 {

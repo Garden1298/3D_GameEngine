@@ -1,13 +1,10 @@
 #define _CRT_SECURE_NO_WARNINGS
 
-
 #include <iostream>
 
 #include "include/GL/glew.h"		
 #include "include/GLFW/glfw3.h" 
-
 #include "glm/glm.hpp"
-
 #include "Object.h"
 #include "RenderableObject.h"
 #include "NonRenderableObject.h"
@@ -16,6 +13,7 @@
 #include "NonRenderSample.h"
 #include "ControlableObject.h"
 #include "Time.h"
+#include "CompositeObject.h"
 
 using namespace glm;
 
@@ -32,33 +30,32 @@ int main()
 
 	Time* time = Time::instance();
 
-	RenderableObject* cube = new RenderableObject();
-	renderer->addObject(cube);
-	cube->setPosition(glm::vec3(1.0f, 1.0f, 1.0f));
+	CompositeObject* player = new CompositeObject();
 
+	ControlableObject* character = new ControlableObject();
+	renderer->addObject(character);
+	character->setPosition(glm::vec3(1.0f, 5.0f, 1.0f));
 	file_mgr->loadObj(
-		cube,
+		character,
 		"cube.obj",
 		"uvtemplate.DDS",
 		"vs.shader",
 		"fs.shader",
 		renderer);
 
-	ControlableObject* moving_cube = new ControlableObject();
-
-	renderer->addObject(moving_cube);
-	moving_cube->setPosition(glm::vec3(1.0f, 5.0f, 1.0f));
-
+	RenderableObject* bullet = new RenderableObject();
+	renderer->addObject(bullet);
+	bullet->setPosition(glm::vec3(1.0f, 5.0f, 3.0f));
 	file_mgr->loadObj(
-		moving_cube,
+		bullet,
 		"cube.obj",
 		"uvtemplate.DDS",
 		"vs.shader",
 		"fs.shader",
 		renderer);
 
-	NonRenderSample* non_render = new NonRenderSample();
-	renderer->addObject(non_render);
+	player->add(character);
+	player->add(bullet);
 
 	while (true)
 	{
@@ -66,7 +63,7 @@ int main()
 		if (time->isUpdateTiming())
 		{
 			renderer->update();
-			moving_cube->computeMatricesFromInputs(renderer->window,moving_cube);		
+			character->computeMatricesFromInputs(renderer->window,character);		
 		}
 
 		//°¡º¯
@@ -75,9 +72,8 @@ int main()
 
 	renderer->shutDown();
 
-	delete cube;
-	delete non_render;
-	delete moving_cube;
+	delete bullet;
+	delete character;
 
 	return 0; 
 }

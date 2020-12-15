@@ -175,7 +175,6 @@ void Renderer::update()
 
 void Renderer::shutDown()
 {
-
 	for (std::vector<RenderableObject*>::iterator iter = _renderingObject.begin(); iter != _renderingObject.end(); iter++)
 	{
 		(*iter)->shutDown();

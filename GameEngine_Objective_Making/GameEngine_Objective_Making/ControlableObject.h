@@ -1,7 +1,8 @@
 #pragma once
 #include "RenderableObject.h"
-
 #include "include/GLFW/glfw3.h"
+
+class RenderableObject;
 
 class ControlableObject:public RenderableObject
 {

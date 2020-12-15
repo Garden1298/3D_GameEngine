@@ -1,4 +1,5 @@
 #include "ControlableObject.h"
+
 #include <iostream>
 
 void ControlableObject::computeMatricesFromInputs(GLFWwindow* window, RenderableObject* object) {

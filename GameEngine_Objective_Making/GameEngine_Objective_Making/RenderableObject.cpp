@@ -1,5 +1,6 @@
 #include "RenderableObject.h"
 #include <iostream>
+#include "Renderer.h"
 
 void RenderableObject::shutDown()
 {
@@ -12,6 +13,23 @@ void RenderableObject::shutDown()
 	glDeleteTextures(1, &Texture);
 	glDeleteVertexArrays(1, &VertexArrayID);
 }
+
+void RenderableObject::addObject(RenderableObject* obj)
+{
+	Renderer::instance()->addObject(obj);
+}
+
+//void loadOBJ(RenderableObject* target_obj,
+//	std::string obj_path,
+//	std::string texture_path,
+//	std::string vs_shader_path,
+//	std::string fs_shader_path,
+//	Renderer* render_obj)
+//{
+//	FileManager::instance()->loadObj(target_obj,
+//		obj_path, texture_path, vs_shader_path,
+//		fs_shader_path, render_obj);
+//}
 
 void RenderableObject::setPosition(glm::vec3 position)
 {
