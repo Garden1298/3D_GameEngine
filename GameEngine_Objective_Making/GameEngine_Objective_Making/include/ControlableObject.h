@@ -1,6 +1,6 @@
 #pragma once
 #include "RenderableObject.h"
-#include "include/GLFW/glfw3.h"
+#include "../include/GLFW/glfw3.h"
 
 class RenderableObject;
 

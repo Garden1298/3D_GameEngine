@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{ba650f1e-06bf-49cc-be2b-659a222a3d87}</ProjectGuid>
-    <RootNamespace>GameEngineObjectiveMaking</RootNamespace>
+    <ProjectGuid>{a5d2dd7c-9f68-4e54-9dde-a7db71c34a06}</ProjectGuid>
+    <RootNamespace>GameMain</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -40,7 +40,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
@@ -78,7 +78,6 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -89,13 +88,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\Administrator\source\repos\GameEngine_Objective_Making\GameEngine_Objective_Making\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\GameEngine_Objective_Making\GameEngine_Objective_Making\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Users\Administrator\source\repos\GameEngine_Objective_Making\GameEngine_Objective_Making\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -143,39 +141,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="source\ControlableObject.cpp" />
-    <ClCompile Include="source\FileManager.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="source\NonRenderableObject.cpp" />
-    <ClCompile Include="source\NonRenderSample.cpp" />
-    <ClCompile Include="source\Object.cpp" />
-    <ClCompile Include="source\RenderableObject.cpp" />
-    <ClCompile Include="source\Renderer.cpp" />
-    <ClCompile Include="source\Sphere.cpp" />
-    <ClCompile Include="source\Template.cpp" />
-    <ClCompile Include="source\Time.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="include\Component.h" />
-    <ClInclude Include="include\CompositeObject.h" />
-    <ClInclude Include="include\ControlableObject.h" />
-    <ClInclude Include="include\FileManager.h" />
-    <ClInclude Include="include\ICleanUp.h" />
-    <ClInclude Include="include\IRenderer.h" />
-    <ClInclude Include="include\IUpdater.h" />
-    <ClInclude Include="include\NonRenderableObject.h" />
-    <ClInclude Include="include\NonRenderSample.h" />
-    <ClInclude Include="include\Object.h" />
-    <ClInclude Include="include\RenderableObject.h" />
-    <ClInclude Include="include\Renderer.h" />
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="include\Sphere.h" />
-    <ClInclude Include="include\Template.h" />
-    <ClInclude Include="include\Time.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="fs.shader" />
-    <None Include="vs.shader" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

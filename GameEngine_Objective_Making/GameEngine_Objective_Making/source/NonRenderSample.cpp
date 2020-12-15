@@ -1,4 +1,4 @@
-#include "NonRenderSample.h"
+#include "../include/NonRenderSample.h"
 
 
 void NonRenderSample::shutDown()

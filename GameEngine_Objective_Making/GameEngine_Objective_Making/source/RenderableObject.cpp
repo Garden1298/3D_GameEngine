@@ -1,6 +1,6 @@
-#include "RenderableObject.h"
+#include "../include/RenderableObject.h"
 #include <iostream>
-#include "Renderer.h"
+#include "../include/Renderer.h"
 
 void RenderableObject::shutDown()
 {

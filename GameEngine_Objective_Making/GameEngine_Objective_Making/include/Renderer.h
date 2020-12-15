@@ -1,9 +1,9 @@
 #pragma once
 #include <iostream>
 
-#include "include/GL/glew.h"
-#include "include/GLFW/glfw3.h" 
-#include "glm/gtc/matrix_transform.hpp"
+#include "../include/GL/glew.h"
+#include "../include/GLFW/glfw3.h" 
+#include "../glm/gtc/matrix_transform.hpp"
 
 #include "Object.h"
 #include "ICleanUp.h"

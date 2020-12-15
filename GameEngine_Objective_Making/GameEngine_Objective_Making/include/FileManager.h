@@ -7,8 +7,8 @@
 #include <iostream>
 #include <map>
 
-#include "include/GL/glew.h"
-#include "glm/gtc/matrix_transform.hpp"
+#include "../include/GL/glew.h"
+#include "../glm/gtc/matrix_transform.hpp"
 
 #include "Object.h"
 #include "RenderableObject.h"

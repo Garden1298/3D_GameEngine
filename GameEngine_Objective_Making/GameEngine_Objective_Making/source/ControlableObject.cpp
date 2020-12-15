@@ -1,4 +1,4 @@
-#include "ControlableObject.h"
+#include "../include/ControlableObject.h"
 
 #include <iostream>
 
